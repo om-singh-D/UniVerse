@@ -1,4 +1,4 @@
--- Enable UUID extension for better ID generation (optional)
+-- Enable UUID extension for better ID generation
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Users table - Core user information
