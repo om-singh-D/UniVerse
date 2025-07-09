@@ -1,10 +1,31 @@
 {
-  "name": "backend",
+  "name": "universe-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Campus Social Network Backend API",
+  "main": "dist/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "type-check": "tsc --noEmit",
+    "db:generate": "npx prisma generate",
+    "db:push": "npx prisma db push",
+    "db:seed": "ts-node prisma/seed.ts",
+    "db:migrate": "npx prisma migrate dev",
+    "db:studio": "npx prisma studio",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.ts",
+    "clean": "rm -rf dist"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
+  "nodemonConfig": {
+    "watch": ["src"],
+    "ext": "ts",
+    "exec": "ts-node src/server.ts"
   },
   "keywords": [],
   "author": "",
