@@ -67,21 +67,6 @@ npm run dev
 
 API documentation is available at \`/api/docs\` when running the server.
 
-## Project Structure
-
-\`\`\`
-src/
-├── controllers/     # Request handlers
-├── middleware/      # Custom middleware
-├── routes/         # Route definitions
-├── services/       # Business logic
-├── utils/          # Helper functions
-├── config/         # Configuration files
-├── types/          # TypeScript definitions
-├── app.ts          # Express app setup
-└── server.ts       # Server startup
-\`\`\`
-
 ## Available Scripts
 
 - \`npm run dev\` - Start development server
