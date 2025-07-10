@@ -1,29 +1,39 @@
-// Database types
-export interface Confession {
-  id: number;
-  userId: number;
+export interface CreateConfessionRequest {
   content: string;
-  categoryId?: number;
-  isApproved: boolean;
-  isAnonymous: boolean;
-  likesCount: number;
-  commentsCount: number;
-  createdAt: Date;
-  updatedAt: Date;
+  category_id?: number;
+  is_anonymous?: boolean;
 }
 
-export interface MarketplaceItem {
-  id: number;
-  userId: number;
+export interface CreateMarketplaceItemRequest {
   title: string;
   description?: string;
   price: number;
-  categoryId?: number;
-  condition: string;
-  status: string;
-  isNegotiable: boolean;
-  viewsCount: number;
-  favoritesCount: number;
-  createdAt: Date;
-  updatedAt: Date;
+  category_id?: number;
+  condition?: string;
+  pickup_location?: string;
+  is_negotiable?: boolean;
+}
+
+export interface CreateStudyGroupRequest {
+  name: string;
+  description?: string;
+  subject?: string;
+  course_code?: string;
+  is_private?: boolean;
+  max_members?: number;
+  requires_approval?: boolean;
+}
+
+export interface CreateEventRequest {
+  title: string;
+  description?: string;
+  location?: string;
+  venue_details?: string;
+  start_date: Date;
+  end_date?: Date;
+  category?: string;
+  max_attendees?: number;
+  registration_required?: boolean;
+  registration_deadline?: Date;
+  is_public?: boolean;
 }

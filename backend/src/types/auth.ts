@@ -1,11 +1,21 @@
-// Auth types
-export interface User {
-  id: number;
+import { Request } from 'express';
+import { User } from '@prisma/client';
+
+export interface AuthenticatedRequest extends Request {
+  user?: User;
+}
+
+export interface JWTPayload {
+  userId: number;
   email: string;
-  name: string;
   username: string;
   isAdmin: boolean;
-  isVerified: boolean;
+}
+
+export interface TokenPair {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
 }
 
 export interface LoginRequest {
@@ -14,14 +24,22 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
+  name: string;
   email: string;
   password: string;
-  name: string;
   username: string;
+  year_of_study?: number;
+  major?: string;
 }
 
-export interface JwtPayload {
-  userId: number;
+export interface AuthResponse {
+  user: Omit<User, 'password_hash'>;
+  tokens: TokenPair;
+}
+
+export interface GoogleProfile {
+  id: string;
   email: string;
-  isAdmin: boolean;
+  name: string;
+  picture?: string;
 }
