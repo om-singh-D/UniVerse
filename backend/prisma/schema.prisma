@@ -1,6 +1,3 @@
-// This is your Prisma schema file
-// Learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,70 +8,69 @@ datasource db {
 }
 
 model User {
-  id                Int       @id @default(autoincrement())
-  email             String    @unique
-  passwordHash      String?   @map("password_hash")
-  name              String    @db.VarChar(100)
-  username          String    @unique @db.VarChar(50)
-  profilePicUrl     String?   @map("profile_pic_url") @db.VarChar(500)
-  bio               String?
-  yearOfStudy       Int?      @map("year_of_study")
-  major             String?   @db.VarChar(100)
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  password_hash   String?
+  name            String
+  username        String   @unique
+  profile_pic_url String?
+  bio             String?
+  year_of_study   Int?
+  major           String?
   
   // SSO fields
-  ssoProvider       String?   @map("sso_provider") @db.VarChar(50)
-  ssoId             String?   @map("sso_id") @db.VarChar(255)
+  sso_provider    String?
+  sso_id          String?
   
   // Account status
-  isVerified        Boolean   @default(false) @map("is_verified")
-  isAdmin           Boolean   @default(false) @map("is_admin")
-  isActive          Boolean   @default(true) @map("is_active")
+  is_verified     Boolean  @default(false)
+  is_admin        Boolean  @default(false)
+  is_active       Boolean  @default(true)
   
   // Privacy settings
-  profileVisibility String    @default("public") @map("profile_visibility") @db.VarChar(20)
+  profile_visibility String @default("public")
   
   // Timestamps
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
-  lastLogin         DateTime? @map("last_login")
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  last_login      DateTime?
 
   // Relations
-  sessions          UserSession[]
-  confessions       Confession[]
-  marketplaceItems  MarketplaceItem[]
-  ownedGroups       StudyGroup[] @relation("GroupOwner")
-  groupMemberships  GroupMembership[]
-  createdEvents     Event[]
-  eventRsvps        EventRsvp[]
-  notifications     Notification[]
-  uploadedFiles     File[]
-  comments          Comment[]
-  likes             Like[]
-  favorites         Favorite[]
-  reports           Report[]
-  moderatedContent  Confession[] @relation("ModeratedBy")
-  reviewedReports   Report[] @relation("ReviewedBy")
+  confessions     Confession[]
+  marketplace_items MarketplaceItem[]
+  study_groups_owned StudyGroup[] @relation("GroupOwner")
+  group_memberships GroupMembership[]
+  events_created  Event[] @relation("EventCreator")
+  event_rsvps     EventRSVP[]
+  notifications   Notification[]
+  user_sessions   UserSession[]
+  comments        Comment[]
+  likes           Like[]
+  favorites       Favorite[]
+  reports_made    Report[] @relation("Reporter")
+  reports_reviewed Report[] @relation("Reviewer")
+  files_uploaded  File[]
 
   @@map("users")
 }
 
 model UserSession {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @map("user_id")
-  tokenHash String   @map("token_hash") @db.VarChar(255)
-  expiresAt DateTime @map("expires_at")
-  createdAt DateTime @default(now()) @map("created_at")
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  token_hash String
+  expires_at DateTime
+  created_at DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("user_sessions")
 }
 
 model ConfessionCategory {
   id          Int      @id @default(autoincrement())
-  name        String   @unique @db.VarChar(50)
+  name        String   @unique
   description String?
-  isActive    Boolean  @default(true) @map("is_active")
+  is_active   Boolean  @default(true)
 
   confessions Confession[]
 
@@ -82,80 +78,300 @@ model ConfessionCategory {
 }
 
 model Confession {
-  id             Int       @id @default(autoincrement())
-  userId         Int?      @map("user_id")
-  content        String
-  categoryId     Int?      @map("category_id")
+  id              Int      @id @default(autoincrement())
+  user_id         Int?
+  content         String
+  category_id     Int?
   
   // Moderation
-  isApproved     Boolean   @default(false) @map("is_approved")
-  isAnonymous    Boolean   @default(true) @map("is_anonymous")
-  isFlagged      Boolean   @default(false) @map("is_flagged")
-  moderatedBy    Int?      @map("moderated_by")
-  moderatedAt    DateTime? @map("moderated_at")
+  is_approved     Boolean  @default(false)
+  is_anonymous    Boolean  @default(true)
+  is_flagged      Boolean  @default(false)
+  moderated_by    Int?
+  moderated_at    DateTime?
   
   // Engagement
-  likesCount     Int       @default(0) @map("likes_count")
-  commentsCount  Int       @default(0) @map("comments_count")
+  likes_count     Int      @default(0)
+  comments_count  Int      @default(0)
   
-  createdAt      DateTime  @default(now()) @map("created_at")
-  updatedAt      DateTime  @updatedAt @map("updated_at")
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 
-  user      User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
-  category  ConfessionCategory? @relation(fields: [categoryId], references: [id])
-  moderator User?               @relation("ModeratedBy", fields: [moderatedBy], references: [id])
-  comments  Comment[]
-  likes     Like[]
-  reports   Report[]
-  notifications Notification[]
+  // Relations
+  user            User?               @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  category        ConfessionCategory? @relation(fields: [category_id], references: [id])
+  comments        Comment[]
+  likes           Like[]
+  reports         Report[]
 
   @@map("confessions")
 }
 
-// Additional models would continue here...
-// Due to length constraints, I'm showing the core models
-// The complete schema would include all tables from your SQL schema
-
-@@map("marketplace_categories")
 model MarketplaceCategory {
   id          Int      @id @default(autoincrement())
-  name        String   @unique @db.VarChar(50)
+  name        String   @unique
   description String?
-  isActive    Boolean  @default(true) @map("is_active")
+  is_active   Boolean  @default(true)
 
   items MarketplaceItem[]
+
+  @@map("marketplace_categories")
 }
 
 model MarketplaceItem {
-  id              Int       @id @default(autoincrement())
-  userId          Int       @map("user_id")
-  title           String    @db.VarChar(200)
+  id              Int      @id @default(autoincrement())
+  user_id         Int
+  title           String
   description     String?
-  price           Decimal   @db.Decimal(10, 2)
-  categoryId      Int?      @map("category_id")
-  condition       String    @default("good") @db.VarChar(20)
+  price           Decimal  @db.Decimal(10, 2)
+  category_id     Int?
+  condition       String   @default("good")
   
   // Status and visibility
-  status          String    @default("available") @db.VarChar(20)
-  isNegotiable    Boolean   @default(true) @map("is_negotiable")
+  status          String   @default("available")
+  is_negotiable   Boolean  @default(true)
   
   // Location
-  pickupLocation  String?   @map("pickup_location") @db.VarChar(200)
+  pickup_location String?
   
   // Engagement
-  viewsCount      Int       @default(0) @map("views_count")
-  favoritesCount  Int       @default(0) @map("favorites_count")
+  views_count     Int      @default(0)
+  favorites_count Int      @default(0)
   
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 
-  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category  MarketplaceCategory? @relation(fields: [categoryId], references: [id])
-  images    ItemImage[]
-  favorites Favorite[]
-  comments  Comment[]
-  reports   Report[]
-  notifications Notification[]
+  // Relations
+  user            User                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  category        MarketplaceCategory? @relation(fields: [category_id], references: [id])
+  images          ItemImage[]
+  favorites       Favorite[]
+  reports         Report[]
 
   @@map("marketplace_items")
+}
+
+model ItemImage {
+  id           Int    @id @default(autoincrement())
+  item_id      Int
+  image_url    String
+  is_primary   Boolean @default(false)
+  display_order Int    @default(0)
+
+  item MarketplaceItem @relation(fields: [item_id], references: [id], onDelete: Cascade)
+
+  @@map("item_images")
+}
+
+model StudyGroup {
+  id               Int      @id @default(autoincrement())
+  name             String
+  description      String?
+  subject          String?
+  course_code      String?
+  owner_id         Int?
+  
+  // Group settings
+  is_private       Boolean  @default(false)
+  max_members      Int      @default(50)
+  requires_approval Boolean @default(false)
+  
+  // Group status
+  is_active        Boolean  @default(true)
+  
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  // Relations
+  owner            User?             @relation("GroupOwner", fields: [owner_id], references: [id], onDelete: SetNull)
+  memberships      GroupMembership[]
+  reports          Report[]
+
+  @@map("study_groups")
+}
+
+model GroupMembership {
+  id        Int      @id @default(autoincrement())
+  group_id  Int
+  user_id   Int
+  role      String   @default("member")
+  status    String   @default("active")
+  joined_at DateTime @default(now())
+
+  group StudyGroup @relation(fields: [group_id], references: [id], onDelete: Cascade)
+  user  User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([group_id, user_id])
+  @@map("group_memberships")
+}
+
+model Event {
+  id                     Int      @id @default(autoincrement())
+  title                  String
+  description            String?
+  location               String?
+  venue_details          String?
+  
+  // Event timing
+  start_date             DateTime
+  end_date               DateTime?
+  
+  // Event metadata
+  created_by             Int?
+  category               String?
+  max_attendees          Int?
+  registration_required  Boolean  @default(false)
+  registration_deadline  DateTime?
+  
+  // Event status
+  status                 String   @default("upcoming")
+  is_public              Boolean  @default(true)
+  
+  created_at             DateTime @default(now())
+  updated_at             DateTime @updatedAt
+
+  // Relations
+  creator                User?      @relation("EventCreator", fields: [created_by], references: [id], onDelete: SetNull)
+  rsvps                  EventRSVP[]
+  reports                Report[]
+
+  @@map("events")
+}
+
+model EventRSVP {
+  id          Int      @id @default(autoincrement())
+  event_id    Int
+  user_id     Int
+  rsvp_status String   @default("going")
+  rsvp_date   DateTime @default(now())
+
+  event Event @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([event_id, user_id])
+  @@map("event_rsvps")
+}
+
+model Notification {
+  id                    Int      @id @default(autoincrement())
+  user_id               Int
+  type                  String
+  title                 String
+  content               String?
+  
+  // Related entities
+  related_confession_id Int?
+  related_item_id       Int?
+  related_event_id      Int?
+  related_group_id      Int?
+  
+  // Notification state
+  is_read               Boolean  @default(false)
+  is_sent               Boolean  @default(false)
+  
+  created_at            DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model File {
+  id                Int      @id @default(autoincrement())
+  uploader_id       Int?
+  original_filename String
+  file_url          String
+  file_type         String?
+  file_size         Int?
+  
+  // File categorization
+  entity_type       String?
+  entity_id         Int?
+  
+  created_at        DateTime @default(now())
+
+  uploader User? @relation(fields: [uploader_id], references: [id], onDelete: SetNull)
+
+  @@map("files")
+}
+
+model Comment {
+  id               Int      @id @default(autoincrement())
+  user_id          Int
+  content          String
+  
+  // Polymorphic relationship
+  commentable_type String
+  commentable_id   Int
+  
+  // Comment threading
+  parent_comment_id Int?
+  
+  // Moderation
+  is_approved      Boolean  @default(true)
+  is_flagged       Boolean  @default(false)
+  
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  user           User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  parent_comment Comment?  @relation("CommentReplies", fields: [parent_comment_id], references: [id], onDelete: Cascade)
+  replies        Comment[] @relation("CommentReplies")
+  likes          Like[]
+  reports        Report[]
+
+  @@map("comments")
+}
+
+model Like {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  
+  // Polymorphic relationship
+  likeable_type String
+  likeable_id   Int
+  
+  created_at   DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, likeable_type, likeable_id])
+  @@map("likes")
+}
+
+model Favorite {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  item_id    Int
+  created_at DateTime @default(now())
+
+  user User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  item MarketplaceItem @relation(fields: [item_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, item_id])
+  @@map("favorites")
+}
+
+model Report {
+  id              Int      @id @default(autoincrement())
+  reporter_id     Int
+  reason          String
+  description     String?
+  
+  // Polymorphic relationship
+  reportable_type String
+  reportable_id   Int
+  
+  // Report status
+  status          String   @default("pending")
+  reviewed_by     Int?
+  reviewed_at     DateTime?
+  
+  created_at      DateTime @default(now())
+
+  reporter User  @relation("Reporter", fields: [reporter_id], references: [id], onDelete: Cascade)
+  reviewer User? @relation("Reviewer", fields: [reviewed_by], references: [id], onDelete: SetNull)
+
+  @@map("reports")
 }
