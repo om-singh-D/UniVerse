@@ -1,3 +1,18 @@
-// Groups controller exports
-export { default as management } from './management';
-export { default as membership } from './membership';
+export { 
+  createGroup, 
+  updateGroup, 
+  deleteGroup, 
+  getGroupById, 
+  getPublicGroups, 
+  getUserGroups 
+} from './management';
+
+export { 
+  joinGroup, 
+  leaveGroup, 
+  removeGroupMember, 
+  updateMemberRole, 
+  getGroupMembers,
+  approveMembership,
+  rejectMembership 
+} from './membership';
