@@ -1,7 +1,7 @@
 {
-  "name": "universe-backend",
+  "name": "backend",
   "version": "1.0.0",
-  "description": "Campus Social Network Backend API",
+  "description": "UniVerse Backend API",
   "main": "dist/server.js",
   "scripts": {
     "dev": "nodemon",
